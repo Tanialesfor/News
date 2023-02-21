@@ -15,7 +15,7 @@
 			<td class="space_around_title_text">${news_title}</td>
 			<td class="space_around_view_text">
 			<div class="word-breaker">
-				 <input type="text" name="title" value="${requestScope.news.title }" > 
+				 <input type="text" name="title" placeholder="enter title of news" value="${requestScope.news.title }" > 
 			</div></td>
 			
 		</tr>
@@ -23,7 +23,7 @@
 			<td class="space_around_title_text">${news_date}</td>
 			<td class="space_around_view_text">
 			<div class="word-breaker">
-				<input type="text" name="date" value="${requestScope.news.newsDate }">
+				<input type="text" name="date" placeholder="template YYYY-MM-DD" value="${requestScope.news.newsDate }">
 			</div></td>
 				
 		</tr>
@@ -32,7 +32,7 @@
 			<td class="space_around_view_text">
 			<div class="word-area-breaker">
 			
-			<textarea rows="8" cols="50" name="brief"> 
+			<textarea rows="8" cols="50" name="brief"  title="enter brief of news"> 
 			<c:out value="${requestScope.news.briefNews }" />
 			</textarea>
 			</div></td>
@@ -43,7 +43,7 @@
 			<td class="space_around_view_text">
 			<div class="word-area-breaker">
 			
-			<textarea rows="12" cols="50" name="content"> 
+			<textarea rows="12" cols="50" name="content"  title="enter content of news"> 
 			<c:out value="${requestScope.news.content }" />
 			</textarea>
 			</div></td>

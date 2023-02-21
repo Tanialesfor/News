@@ -1,0 +1,9 @@
+The next version of standard Java will incubate scoped values, an API that enables sharing immutable data within and across large numbers 
+of threads. Java 20, or Java Development Kit (JDK) 20, the next planned version of standard Java, has reached the release candidate stage, 
+having completed rampdown phases. The six features officially marked for the release are either in an incubation or in a preview stage. 
+These include scoped values, record patterns, pattern matching for switch statements and expressions, a foreign function and memory API, 
+virtual threads, and structured concurrency. Java 20 moved to the release candidate phase on February 9, according to a bulletin from 
+Oracle's Mark Reinhold, chief architect of the Java Platform Group. A second release candidate is due February 23. The release reached 
+an initial rampdown phase on December 8 and a subsequent rampdown phase on January 19, with developers looking to fix bugs and possibly 
+add late enhancements, with approvals required. The JDK is due for general availability on March 21, 2023, as part of Oracle’s six-month 
+ cadence for standard Java editions. JDK 20 would follow the September 20 release of JDK 19. Early-access builds of JDK 20 can be found at jdk.java.net. 

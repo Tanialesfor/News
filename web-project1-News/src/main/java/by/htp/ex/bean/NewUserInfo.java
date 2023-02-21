@@ -112,8 +112,10 @@ private static final long serialVersionUID = 1L;
 
 	@Override
 	public String toString() {
-		return "NewUserInfo [userName=" + userName + ", userSurname=" + userSurname + ", birthday=" + birthday
-				+ ", email=" + email + ", login=" + login + ", password=" + password + ", role=" + role + "]";
+		StringBuilder str= new StringBuilder();
+		str.append("NewUserInfo [userName=").append(userName).append(", userSurname=").append(userSurname).append(", birthday=").append(birthday).append(", email=").append(email).append(", login=").append(login).append(", password=").append(password).append(", role=").append(role).append("]");
+		return str.toString();
+		
 	}
 
 	

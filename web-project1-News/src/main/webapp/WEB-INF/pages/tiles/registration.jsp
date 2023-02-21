@@ -15,7 +15,7 @@
 			<td class="space_around_title_text">${name}    </td>
 			<td class="space_around_view_text">
 			<div class="word-breaker">
-				<input type="text" name="name" value="${requestScope.user.userName}" > 
+				<input type="text" name="name" placeholder="symbols from 1 to 10" value="${requestScope.user.userName}" > 
 			</div></td>
 			
 		</tr>
@@ -24,7 +24,7 @@
 			<td class="space_around_title_text">${surname}    </td>
 			<td class="space_around_view_text">
 			<div class="word-breaker">
-				<input type="text" name="surname" value="${requestScope.user.userSurname}" > 
+				<input type="text" name="surname" placeholder="symbols from 1 to 15" value="${requestScope.user.userSurname}" > 
 			</div></td>
 			
 		</tr>
@@ -33,7 +33,7 @@
 			<td class="space_around_title_text">${birthday}    </td>
 			<td class="space_around_view_text">
 			<div class="word-breaker">
-				<input type="text" name="birthday" value="${requestScope.user.birthday}" > 
+				<input type="text" name="birthday" placeholder="template YYYY-MM-DD" value="${requestScope.user.birthday}" > 
 			</div></td>
 			
 		</tr>
@@ -42,7 +42,7 @@
 			<td class="space_around_title_text">${email}</td>
 			<td class="space_around_view_text">
 			<div class="word-breaker">
-				<input type="text" name="email" value="${requestScope.user.email}" > 
+				<input type="text" name="email"  placeholder="enter your email" value="${requestScope.user.email}" > 
 			</div></td>
 				
 		</tr>
@@ -50,7 +50,7 @@
 			<td class="space_around_title_text">${login}</td>
 			<td class="space_around_view_text">
 			<div class="word-breaker">
-				<input type="text" name="login" value="${requestScope.user.login}" > 
+				<input type="text" name="login" placeholder="symbols from 1 to 10" value="${requestScope.user.login}" > 
 			</div></td>
 			
 		</tr>
@@ -58,7 +58,7 @@
 			<td class="space_around_title_text">${password}</td>
 			<td class="space_around_view_text">
 			<div class="word-breaker">
-				<input type="text" name="password" value="${requestScope.user.password}" > 
+				<input type="text" name="password" placeholder="symbols from 1 to 10" value="${requestScope.user.password}" > 
 			</div></td>
 			
 		</tr>

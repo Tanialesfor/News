@@ -53,7 +53,9 @@ public class Role implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Role [nameofRole=" + nameofRole + ", adminProperty=" + adminProperty + "]";
+		StringBuilder str= new StringBuilder();
+		str.append("Role [nameofRole=").append(nameofRole).append(", adminProperty=").append(adminProperty).append("]");
+		return str.toString();
 	}
 
 }

@@ -4,6 +4,7 @@
 
 <div class="body-title">
 	<a href="controller?command=go_to_news_list"> ${news_} </a> ${view_news_b}
+	<br /> <br /> <br /> <br />
 </div>
 
 <div class="add-table-margin">

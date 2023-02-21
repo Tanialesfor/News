@@ -4,6 +4,7 @@
 
 <div class="body-title">
 	<a href="controller?command=go_to_news_list">${news_} </a> ${news_list_b}
+	<br /> <br /> <br /> <br />
 	</div>
 
 <form action="controller" method="post">

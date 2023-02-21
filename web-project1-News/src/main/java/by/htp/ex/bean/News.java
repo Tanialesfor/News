@@ -86,8 +86,9 @@ public class News implements Serializable {
 
 	@Override
 	public String toString() {
-		return "News [idNews=" + idNews + ", title=" + title + ", briefNews=" + briefNews + ", content=" + content
-				+ ", newsDate=" + newsDate + "]";
+		StringBuilder str= new StringBuilder();
+		str.append("News [idNews=").append(idNews).append(", title=").append(title).append(", briefNews=").append(briefNews).append(", content=").append(content).append(", newsDate=").append(newsDate).append("]");
+		return str.toString();
 	}	
 	
 	

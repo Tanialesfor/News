@@ -1,56 +1,20 @@
 package by.htp.ex.dao.impl;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
-
 import by.htp.ex.bean.NewUserInfo;
-import by.htp.ex.bean.Role;
 import by.htp.ex.dao.DaoException;
-import by.htp.ex.dao.DaoProvider;
 import by.htp.ex.dao.IUserDAO;
-import by.htp.ex.dao.impl.connectionpool.ConnectionPool;
-import by.htp.ex.dao.impl.connectionpool.ConnectionPoolException;
-import by.htp.ex.service.ServiceException;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
+import by.htp.ex.dao.connectionpool.ConnectionPool;
+import by.htp.ex.dao.connectionpool.ConnectionPoolException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import by.htp.ex.dao.impl.connectionpool.ConnectionPool;
+import java.util.concurrent.locks.ReentrantLock;
+import org.mindrot.jbcrypt.*;
 
 public class UserDAO implements IUserDAO {	
 	
-	
-//    List<Role> roleArray = new ArrayList<Role>();
-//    {
-//    	roleArray.add(new Role ("admin", true));
-//    	roleArray.add(new Role ("user", false));
-//    }	
-     
-//	public Role getRole(String nameOfRole) {
-//		for (Role element : roleArray) {
-//			if (element.getNameofRole().equals(nameOfRole)) {
-//				return element;
-//			}			
-//		}
-//		return null;
-//	}
-//    
-//	public boolean isAdmin(Role role) {
-//		if (role.getAdminProperty()==true) {
-//			return true;
-//		} else {
-//			return false;
-//		}
-//	} 
 	
 //    List<NewUserInfo> userArray = new ArrayList<NewUserInfo>();
 //	{
@@ -60,7 +24,6 @@ public class UserDAO implements IUserDAO {
 //		userArray.add(new NewUserInfo ("Kate", "kate.1992@gmail.com","kate1992", "4441992", getRole("user")));
 //		userArray.add(new NewUserInfo ("Ula", "ula.1999@gmail.com","ula1999", "5551999", getRole("user")));
 //	 }  
-	
 	private static final String SELECT_PASSWORD_FROM_LOGIN = "SELECT password FROM users WHERE login = ?";
 	private static final String SELECT_ID_FROM_LOGIN = "SELECT id FROM users WHERE login = ?";
 	private static final String SELECT_ROLE_NAME_FROM_LOGIN = "SELECT role_name FROM news.roles INNER JOIN news.users ON news.roles.id=news.users.roles_id WHERE login = ?";
@@ -70,7 +33,36 @@ public class UserDAO implements IUserDAO {
 	private static final String INSERT_USERS = "INSERT INTO users(login, password, date_registration, roles_id, status_id) VALUES(?, ?, ?, ?, ?)";
 	private static final String INSERT_USERS_DETAILS = "INSERT INTO user_details(users_id, name, surname, birthday, email) VALUES(?, ?, ?, ?, ?)";
 	
-	private final ConnectionPool pool = ConnectionPool.getConnectionPool();		
+	private final ConnectionPool pool = ConnectionPool.getConnectionPool();	
+	
+	private static int workload = 12;
+
+	public static String hashPassword(String password_plaintext) {
+		String salt = BCrypt.gensalt(workload);
+		String hashed_password = BCrypt.hashpw(password_plaintext, salt);
+
+		return(hashed_password);
+	}
+
+	public static boolean checkPassword(String password_plaintext, String stored_hash) {
+		boolean password_verified = false;
+
+		//From https://en.wikipedia.org/wiki/Bcrypt
+		//The bcrypt function is the default password hash algorithm for BSD and other systems including some Linux distributions such as SUSE Linux.[2] 
+		//The prefix "$2a$" or "$2b$" (or "$2y$") in a hash string in a shadow password file indicates that hash string is a bcrypt hash in modular crypt format.[3] 
+		//The rest of the hash string includes the cost parameter, a 128-bit salt (base-64 encoded as 22 characters), and 
+		//184 bits of the resulting hash value (base-64 encoded as 31 characters).[4] 
+		//The cost parameter specifies a key expansion iteration count as a power of two, which is an input to the crypt algorithm.
+		
+		if(null == stored_hash || !stored_hash.startsWith("$2a$"))
+			throw new java.lang.IllegalArgumentException("Invalid hash provided for comparison");
+
+		password_verified = BCrypt.checkpw(password_plaintext, stored_hash);
+
+		return(password_verified);
+	}
+	
+	
 	
     @Override
  	public boolean logination(String login, String password) throws DaoException {
@@ -87,7 +79,8 @@ public class UserDAO implements IUserDAO {
 			
 			rs = ps.executeQuery();
 			while (rs.next()) {
-		        if (rs.getString("password").equals(password)) {	        	
+				if (checkPassword(password, rs.getString("password"))){
+//		        if (rs.getString("password").equals(password)) {	        	
 		        	success = true;
 		        }
 			}
@@ -218,17 +211,17 @@ public class UserDAO implements IUserDAO {
 
 	@Override
 	public boolean registration(NewUserInfo user) throws DaoException {				
-		Connection con = null;
 		PreparedStatement ps=null;
-						
+		ReentrantLock locker = new ReentrantLock();
+		
 		if (loginExist(user.getLogin())==false) {
-			try  {	
-				con = pool.takeConnection();
+			locker.lock();
+			try (Connection con = pool.takeConnection()) {	
 				con.setAutoCommit(false);
 				ps = con.prepareStatement(INSERT_USERS);
 	
 				ps.setString(1, user.getLogin());
-				ps.setString(2, user.getPassword());
+				ps.setString(2, hashPassword(user.getPassword()));
 				Date now = new Date();
 				java.sql.Date date = new java.sql.Date(now.getTime());
 				ps.setDate(3, date);
@@ -251,7 +244,7 @@ public class UserDAO implements IUserDAO {
 							success = true;	
 						}
 						
-						ps2.close();
+//						ps2.close();
 						rs.close();
 					}
 					catch (SQLException e) {
@@ -271,7 +264,7 @@ public class UserDAO implements IUserDAO {
 					
 					if (ps3.executeUpdate()>=1) {
 						con.commit();
-						ps3.close();
+//						ps3.close();
 						success = true;	
 					}
 					else con.rollback();
@@ -280,7 +273,7 @@ public class UserDAO implements IUserDAO {
 					if (success == true) {
 					return true;
 				}
-			
+								
 			}
 			catch (SQLException e) {
 				throw new DaoException("error insert user in tables users, user_details from method registration",e);
@@ -288,8 +281,8 @@ public class UserDAO implements IUserDAO {
 			catch (ConnectionPoolException e) {
 				throw new DaoException("problem with connection pool", e);
 			}
-			finally {
-				pool.closeConnection(con, ps);
+			finally{
+				locker.unlock(); 
 			}
 		}
 		return false;

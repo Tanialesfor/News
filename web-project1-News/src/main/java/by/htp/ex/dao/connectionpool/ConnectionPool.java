@@ -1,4 +1,4 @@
-package by.htp.ex.dao.impl.connectionpool;
+package by.htp.ex.dao.connectionpool;
 
 import java.sql.Array;
 import java.sql.Blob;
@@ -125,7 +125,11 @@ public class ConnectionPool {
 
 	public void closeConnection(Connection con, Statement st, ResultSet rs) {
 
-		// con.close();
+		try {
+			con.close();
+		} catch (SQLException e) {
+			// logger.log(Level.ERROR, "Connection isn't return to the pool.");
+		}
 
 		try {
 			rs.close();
@@ -139,13 +143,14 @@ public class ConnectionPool {
 			// logger.log(Level.ERROR, "Statement isn't closed.");
 		}
 
-		givenAwayConQueue.remove(con);
-		connectionQueue.add(con);
 	}
 
 	public void closeConnection(Connection con, Statement st) {
-
-		// con.close();
+		try {
+			con.close();
+		} catch (SQLException e) {
+			// logger.log(Level.ERROR, "Connection isn't return to the pool.");
+		}
 
 		try {
 			st.close();
@@ -153,8 +158,6 @@ public class ConnectionPool {
 			// logger.log(Level.ERROR, "Statement isn't closed.");
 		}
 
-		givenAwayConQueue.remove(con);
-		connectionQueue.add(con);
 	}
 
 	private void closeConnectionsQueue(BlockingQueue<Connection> queue) throws SQLException {
