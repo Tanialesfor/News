@@ -6,6 +6,7 @@ ${guest_info}
 
 <div class="body-title">
 	<a href=""> ${news_} </a> ${latest_news}
+	<br /> <br /> <br /> <br />
 </div>
 
 <form action="command.do?method=delete" method="post">

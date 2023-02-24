@@ -1,0 +1,19 @@
+ 			
+As an alternative to the synchronized statement, we can use locks to control access to a shared resource. The functionality of locks is contained in the java.util.concurrent.locks package.
+ As a rule, to work with locks, the ReentrantLock class is used, which implements the Lock interface.
+ 
+ First, the thread tries to access the shared resource. If it is free, then a lock is placed on it. When the work is completed, the lock on the share is released. If the resource is not free and the lock is already on it, then the thread waits until this lock is released. 
+ Lock classes implement the Lock interface, which defines the following methods:
+ 
+ void lock(): waits until a lock is acquired
+ 
+ void lockInterruptibly() throws InterruptedException: waits until a lock is acquired if the thread is not interrupted
+ 
+ boolean tryLock(): Attempts to acquire a lock, if a lock is acquired, returns true. If the lock is not acquired, then returns false. Unlike the lock() method, it does not wait for the lock to be obtained if it is not available.
+ 
+ void unlock(): releases the lock
+ 
+ Condition newCondition(): returns the Condition object that is associated with the current lock
+ The organization of a lock is generally quite simple: to obtain a lock, the lock() method is called, and after the work with shared resources is finished, the unlock() method is called, which releases the lock.
+ 
+ The Condition object allows you to control the blocking.			

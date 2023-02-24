@@ -34,18 +34,19 @@ public class UserDAO implements IUserDAO {
 	private static final String INSERT_USERS_DETAILS = "INSERT INTO user_details(users_id, name, surname, birthday, email) VALUES(?, ?, ?, ?, ?)";
 	
 	private final ConnectionPool pool = ConnectionPool.getConnectionPool();	
+	private static final ReentrantLock locker = new ReentrantLock();
 	
 	private static int workload = 12;
 
-	public static String hashPassword(String password_plaintext) {
+	public static String hashPassword(String passwordPlaintext) {
 		String salt = BCrypt.gensalt(workload);
-		String hashed_password = BCrypt.hashpw(password_plaintext, salt);
+		String hashedPassword = BCrypt.hashpw(passwordPlaintext, salt);
 
-		return(hashed_password);
+		return(hashedPassword);
 	}
 
-	public static boolean checkPassword(String password_plaintext, String stored_hash) {
-		boolean password_verified = false;
+	public static boolean checkPassword(String passwordPlaintext, String storedHash) {
+		boolean passwordVerified = false;
 
 		//From https://en.wikipedia.org/wiki/Bcrypt
 		//The bcrypt function is the default password hash algorithm for BSD and other systems including some Linux distributions such as SUSE Linux.[2] 
@@ -54,15 +55,13 @@ public class UserDAO implements IUserDAO {
 		//184 bits of the resulting hash value (base-64 encoded as 31 characters).[4] 
 		//The cost parameter specifies a key expansion iteration count as a power of two, which is an input to the crypt algorithm.
 		
-		if(null == stored_hash || !stored_hash.startsWith("$2a$"))
+		if(null == storedHash || !storedHash.startsWith("$2a$"))
 			throw new java.lang.IllegalArgumentException("Invalid hash provided for comparison");
 
-		password_verified = BCrypt.checkpw(password_plaintext, stored_hash);
+		passwordVerified = BCrypt.checkpw(passwordPlaintext, storedHash);
 
-		return(password_verified);
+		return(passwordVerified);
 	}
-	
-	
 	
     @Override
  	public boolean logination(String login, String password) throws DaoException {
@@ -212,8 +211,7 @@ public class UserDAO implements IUserDAO {
 	@Override
 	public boolean registration(NewUserInfo user) throws DaoException {				
 		PreparedStatement ps=null;
-		ReentrantLock locker = new ReentrantLock();
-		
+				
 		if (loginExist(user.getLogin())==false) {
 			locker.lock();
 			try (Connection con = pool.takeConnection()) {	
@@ -243,18 +241,17 @@ public class UserDAO implements IUserDAO {
 							user_id = rs.getInt("id");
 							success = true;	
 						}
-						
-//						ps2.close();
-						rs.close();
 					}
 					catch (SQLException e) {
-						throw new DaoException(e);
+						con.rollback();
+						throw new DaoException("error select id in tables users from method registration",e);
 					}
 				}
-				else con.rollback();
+//				else con.rollback();
 				
 				if (success = true) {
 					success = false;
+					try {
 					PreparedStatement ps3 = con.prepareStatement(INSERT_USERS_DETAILS);
 					ps3.setInt(1, user_id);
 					ps3.setString(2, user.getUserName());
@@ -262,21 +259,25 @@ public class UserDAO implements IUserDAO {
 					ps3.setString(4, user.getBirthday());
 					ps3.setString(5, user.getEmail());
 					
-					if (ps3.executeUpdate()>=1) {
+					  if (ps3.executeUpdate()>=1) {
 						con.commit();
-//						ps3.close();
 						success = true;	
+					  }
+					} 
+					catch (SQLException e) {
+						con.rollback();
+						throw new DaoException("error insert user in table user_details from method registration",e);
 					}
-					else con.rollback();
+//					else con.rollback();
+					
 				} 
-			 
 					if (success == true) {
 					return true;
 				}
 								
 			}
 			catch (SQLException e) {
-				throw new DaoException("error insert user in tables users, user_details from method registration",e);
+					throw new DaoException("error insert user in tables users, user_details from method registration",e);
 			}
 			catch (ConnectionPoolException e) {
 				throw new DaoException("problem with connection pool", e);

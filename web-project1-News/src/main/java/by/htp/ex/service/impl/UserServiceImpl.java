@@ -6,6 +6,8 @@ import by.htp.ex.dao.DaoProvider;
 import by.htp.ex.dao.IUserDAO;
 import by.htp.ex.service.ServiceException;
 import by.htp.ex.util.validation.UserDataValidation;
+import by.htp.ex.util.validation.UserValidator;
+import by.htp.ex.util.validation.UserValidator.UserValidationBuilder;
 import by.htp.ex.util.validation.ValidationProvider;
 import by.htp.ex.service.IUserService;
 
@@ -18,10 +20,12 @@ public class UserServiceImpl implements IUserService{
 	@Override
 	public String signIn(String login, String password) throws ServiceException {
 				
-		if(!userDataValidation.checkAUthData(login, password)) { 
-			throw new ServiceException("login or password invalid"); 
+		UserValidationBuilder userValidationBuilder = new UserValidator.UserValidationBuilder();
+		UserValidator validator = userValidationBuilder.checkAUthData(login, password).isValid();
+
+		if (!validator.getErrors().isEmpty()) {
+			throw new ServiceException(validator.getErrors().toString());
 		}
-		else { 		
 			try {
 				if(userDAO.logination(login, password)) {
 					return userDAO.getRole(login, password);
@@ -31,7 +35,6 @@ public class UserServiceImpl implements IUserService{
 			} catch(DaoException e) {
 				throw new ServiceException("error from method signIn Service", e);
 			}
-		}			
 	}
 
 	@Override
@@ -43,11 +46,14 @@ public class UserServiceImpl implements IUserService{
 		String login=user.getLogin();
 		String password=user.getPassword();
 		
-		if (!userDataValidation.checkRegData(name, surname, birthday, login, password, email)) {
-			throw new ServiceException("input field invalid");
-		} 
-		else {
-			try {
+		UserValidationBuilder userValidationBuilder = new UserValidator.UserValidationBuilder();
+		UserValidator validator = userValidationBuilder.checkARegData(name, surname, birthday, login, password, email).isValid();
+
+		if (!validator.getErrors().isEmpty()) {
+			throw new ServiceException(validator.getErrors().toString());
+		}
+		
+		    try {
 				if (userDAO.registration(user)) {
 					return true;
 				} else {
@@ -56,15 +62,18 @@ public class UserServiceImpl implements IUserService{
 			} catch (DaoException e) {
 				throw new ServiceException("error from method registration Service", e);
 			}
-		}		
 	}
 
 	@Override
 	public boolean isAdmin(String login, String password) throws ServiceException {
 		
-		if(!userDataValidation.checkAUthData(login, password)) { 
-			throw new ServiceException("login or password invalid"); 
+		UserValidationBuilder userValidationBuilder = new UserValidator.UserValidationBuilder();
+		UserValidator validator = userValidationBuilder.checkAUthData(login, password).isValid();
+
+		if (!validator.getErrors().isEmpty()) {
+			throw new ServiceException(validator.getErrors().toString());
 		}
+		
 		else {
 			try {
 				if (userDAO.isAdmin(login, password)==true) {
