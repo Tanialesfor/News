@@ -46,7 +46,7 @@
 		</tr>
 	</table>
 	
-	<c:if test="${sessionScope.role eq 'admin'}">
+	<c:if test="${sessionScope.role eq 'admin' || sessionScope.role eq 'editor'}">
 	<div class="first-view-button">
 			<input type="hidden" name="command" value="do_edit_news" /> 
 			<input type="hidden" name="id" value="${requestScope.news.idNews}" /> 

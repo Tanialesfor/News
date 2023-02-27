@@ -5,6 +5,6 @@ import by.htp.ex.bean.NewUserInfo;
 public interface IUserService {
 	
 	String signIn(String login, String password) throws ServiceException;
-	boolean isAdmin(String login, String password) throws ServiceException;
+	boolean isPermission(String login, String password) throws ServiceException;
 	boolean registration(NewUserInfo user) throws ServiceException;
 }

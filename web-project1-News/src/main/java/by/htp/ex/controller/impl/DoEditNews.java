@@ -29,7 +29,7 @@ public class DoEditNews implements Command {
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = (HttpSession) request.getSession();
 
-		if (SecurityController.isAdminRole(session) == true) {
+		if (SecurityController.isPermissionRole(session) == true) {
 			int newsId = Integer.parseInt(request.getParameter(JSP_NEWS_ID));
 			String title = request.getParameter(JSP_TITLE);
 			String brief = request.getParameter(JSP_BRIEF);
@@ -43,7 +43,7 @@ public class DoEditNews implements Command {
 				session.setAttribute(AUTHER_MESSAGE, "news edited successfully");
 				response.sendRedirect("controller?command=go_to_news_list");
 			} catch (ServiceException e) {
-				session.setAttribute(ERROR_MESSAGE, "error when trying to edit news");
+				session.setAttribute(ERROR_MESSAGE, e.getMessage()); // "error when trying to edit news"
 				response.sendRedirect("controller?command=go_to_error_page");
 			}
 		} else {

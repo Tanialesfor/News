@@ -22,9 +22,7 @@ public class GoToNewsList implements Command {
 		try {
 			newsList = newsService.list();
 			request.setAttribute("news", newsList);
-			request.setAttribute("presentation", "newsList");
-			
-			//request.setAttribute("news", null);
+			request.setAttribute("presentation", "newsList");			
 
 			request.getRequestDispatcher("WEB-INF/pages/layouts/baseLayout.jsp").forward(request, response);
 		} catch (ServiceException e) {

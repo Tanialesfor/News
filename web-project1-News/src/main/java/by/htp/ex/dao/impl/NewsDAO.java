@@ -19,7 +19,7 @@ import by.htp.ex.dao.connectionpool.ConnectionPoolException;
 public class NewsDAO implements INewsDAO {
 
 	private static final String SELECT_LATEST_NEWS = "SELECT * FROM news.news WHERE status_news_id = ? or status_news_id = ? ORDER BY news.news.date_creation DESC LIMIT ?";
-	private static final String SELECT_ALL_NEWS = "SELECT * FROM news.news WHERE status_news_id = ? or status_news_id = ?";
+	private static final String SELECT_ALL_NEWS = "SELECT * FROM news.news WHERE status_news_id = ? or status_news_id = ? ORDER BY news.news.date_creation DESC";
 	private static final String INSERT_NEWS = "INSERT INTO news.news(title, date_creation, brief, content, users_id, status_news_id) VALUES(?, ?, ?, ?, ?, ?)";
 	private static final String SELECT_NEWS_FOR_ID = "SELECT * FROM news.news WHERE id = ?";
 	private static final String UPDATE_NEWS = "UPDATE news.news SET title = ?, date_creation = ?, brief = ?, content = ?, users_id = ?, status_news_id = ? WHERE id = ?";

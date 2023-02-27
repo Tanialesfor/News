@@ -23,13 +23,13 @@
 				</div>
 				<div class="news-link-to-wrapper">
 					<div class="link-position">
-						<c:if test="${sessionScope.role eq 'admin'}">
+						<c:if test="${sessionScope.role eq 'admin' || sessionScope.role eq 'editor'}">
 						      <a href="controller?command=go_to_edit_news&id=${news.idNews}"> ${editlink} </a> 
 						</c:if>
 						
 						<a href="controller?command=go_to_view_news&id=${news.idNews}"> ${viewlink} </a> 
    					    
-   					    <c:if test="${sessionScope.role eq 'admin'}">
+   					    <c:if test="${sessionScope.role eq 'admin' || sessionScope.role eq 'editor'}">
    					         <input type="checkbox" name="id" value="${news.idNews}" />
    					    </c:if>
 					</div>
@@ -55,7 +55,7 @@
 	</c:if>
 	</div>
 
-	<c:if test="${sessionScope.role eq 'admin'}">
+	<c:if test="${sessionScope.role eq 'admin' || sessionScope.role eq 'editor'}">
 		<div class="first-view-button">
 			<input type="hidden" name="command" value="do_delete_news" /> 
 			<input type="submit" value="${delete}" />

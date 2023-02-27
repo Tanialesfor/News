@@ -15,21 +15,12 @@ import org.mindrot.jbcrypt.*;
 
 public class UserDAO implements IUserDAO {	
 	
-	
-//    List<NewUserInfo> userArray = new ArrayList<NewUserInfo>();
-//	{
-//		userArray.add(new NewUserInfo ("Roman", "roman.2000@gmail.com","roman2000", "1112000", getRole("admin")));
-//		userArray.add(new NewUserInfo ("Anet", "anet.1990@gmail.com","anet1990", "2221990", getRole("user")));
-//		userArray.add(new NewUserInfo ("Vlad", "vlad.1995@gmail.com","vlad", "3331995", getRole("user")));
-//		userArray.add(new NewUserInfo ("Kate", "kate.1992@gmail.com","kate1992", "4441992", getRole("user")));
-//		userArray.add(new NewUserInfo ("Ula", "ula.1999@gmail.com","ula1999", "5551999", getRole("user")));
-//	 }  
 	private static final String SELECT_PASSWORD_FROM_LOGIN = "SELECT password FROM users WHERE login = ?";
 	private static final String SELECT_ID_FROM_LOGIN = "SELECT id FROM users WHERE login = ?";
 	private static final String SELECT_ROLE_NAME_FROM_LOGIN = "SELECT role_name FROM news.roles INNER JOIN news.users ON news.roles.id=news.users.roles_id WHERE login = ?";
 	private static final String SELECT_PERMISSION_NAME_FROM_PREMID_LOGIN = "SELECT permission_name FROM news.permissions INNER JOIN news.role_has_permissions ON news.permissions.id=news.role_has_permissions.permissions_id \r\n"
 	+ "INNER JOIN news.roles ON news.roles.id=news.role_has_permissions.roles_id \r\n"
-	+ "INNER JOIN news.users ON news.roles.id=news.users.roles_id WHERE news.permissions.id='2' AND news.users.login=?";
+	+ "INNER JOIN news.users ON news.roles.id=news.users.roles_id WHERE news.permissions.id=? AND news.users.login=?";
 	private static final String INSERT_USERS = "INSERT INTO users(login, password, date_registration, roles_id, status_id) VALUES(?, ?, ?, ?, ?)";
 	private static final String INSERT_USERS_DETAILS = "INSERT INTO user_details(users_id, name, surname, birthday, email) VALUES(?, ?, ?, ?, ?)";
 	
@@ -172,7 +163,7 @@ public class UserDAO implements IUserDAO {
 	return nameRole;
 }
 	
-	public boolean isAdmin(String login, String password) throws DaoException {
+	public boolean isPermission(String login, String password) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps=null;
 		ResultSet rs = null;
@@ -181,7 +172,8 @@ public class UserDAO implements IUserDAO {
 			if (logination(login, password)==true) {						
 				con = pool.takeConnection();     
 				ps = con.prepareStatement(SELECT_PERMISSION_NAME_FROM_PREMID_LOGIN);
-				ps.setString(1, login);			
+				ps.setInt(1, 2); // permission editing
+				ps.setString(2, login);
 				
 				rs = ps.executeQuery();					
 				
@@ -237,6 +229,8 @@ public class UserDAO implements IUserDAO {
 						ps2.setString(1, user.getLogin());					
 						ResultSet rs = ps2.executeQuery();
 						
+						con.commit();
+						
 						while (rs.next()) {
 							user_id = rs.getInt("id");
 							success = true;	
@@ -247,31 +241,29 @@ public class UserDAO implements IUserDAO {
 						throw new DaoException("error select id in tables users from method registration",e);
 					}
 				}
-//				else con.rollback();
 				
 				if (success = true) {
 					success = false;
 					try {
-					PreparedStatement ps3 = con.prepareStatement(INSERT_USERS_DETAILS);
-					ps3.setInt(1, user_id);
-					ps3.setString(2, user.getUserName());
-					ps3.setString(3, user.getUserSurname());
-					ps3.setString(4, user.getBirthday());
-					ps3.setString(5, user.getEmail());
-					
-					  if (ps3.executeUpdate()>=1) {
-						con.commit();
-						success = true;	
-					  }
+						PreparedStatement ps3 = con.prepareStatement(INSERT_USERS_DETAILS);
+						ps3.setInt(1, user_id);
+						ps3.setString(2, user.getUserName());
+						ps3.setString(3, user.getUserSurname());
+						ps3.setString(4, user.getBirthday());
+						ps3.setString(5, user.getEmail());						
+						
+						if (ps3.executeUpdate()>=1) {
+							con.commit();
+							success = true;	
+						}
 					} 
 					catch (SQLException e) {
 						con.rollback();
 						throw new DaoException("error insert user in table user_details from method registration",e);
-					}
-//					else con.rollback();
-					
+					}					
 				} 
-					if (success == true) {
+				
+				if (success == true) {
 					return true;
 				}
 								

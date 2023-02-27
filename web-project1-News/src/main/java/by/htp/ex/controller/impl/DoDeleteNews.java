@@ -6,7 +6,6 @@ import by.htp.ex.controller.impl.security.SecurityController;
 import by.htp.ex.service.INewsService;
 import by.htp.ex.service.ServiceException;
 import by.htp.ex.service.ServiceProvider;
-import by.htp.ex.service.impl.NewsServiceImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,7 +23,7 @@ public class DoDeleteNews implements Command {
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = (HttpSession) request.getSession();
 
-		if (SecurityController.isAdminRole(session) == true) {
+		if (SecurityController.isPermissionRole(session) == true) {
 			String[] newsId = request.getParameterValues(JSP_NEWS_ID);
 			if (newsId != null) {
 				try {

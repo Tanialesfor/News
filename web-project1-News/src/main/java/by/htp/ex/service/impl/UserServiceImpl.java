@@ -5,18 +5,14 @@ import by.htp.ex.dao.DaoException;
 import by.htp.ex.dao.DaoProvider;
 import by.htp.ex.dao.IUserDAO;
 import by.htp.ex.service.ServiceException;
-import by.htp.ex.util.validation.UserDataValidation;
 import by.htp.ex.util.validation.UserValidator;
 import by.htp.ex.util.validation.UserValidator.UserValidationBuilder;
-import by.htp.ex.util.validation.ValidationProvider;
 import by.htp.ex.service.IUserService;
 
 public class UserServiceImpl implements IUserService{
 
 	private final IUserDAO userDAO = DaoProvider.getInstance().getUserDao();
-    private final UserDataValidation userDataValidation = ValidationProvider.getInstance().getUserDataValidation();
-    
-	
+   
 	@Override
 	public String signIn(String login, String password) throws ServiceException {
 				
@@ -65,7 +61,7 @@ public class UserServiceImpl implements IUserService{
 	}
 
 	@Override
-	public boolean isAdmin(String login, String password) throws ServiceException {
+	public boolean isPermission(String login, String password) throws ServiceException {
 		
 		UserValidationBuilder userValidationBuilder = new UserValidator.UserValidationBuilder();
 		UserValidator validator = userValidationBuilder.checkAUthData(login, password).isValid();
@@ -76,11 +72,11 @@ public class UserServiceImpl implements IUserService{
 		
 		else {
 			try {
-				if (userDAO.isAdmin(login, password)==true) {
+				if (userDAO.isPermission(login, password)==true) {
 					return true;
 				}
 			} catch (DaoException e) {
-				throw new ServiceException("error from method isAdmin Service", e);
+				throw new ServiceException("error from method isPermission Service", e);
 			}
 			return false;
 		}

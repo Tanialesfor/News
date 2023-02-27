@@ -8,57 +8,54 @@ import by.htp.ex.dao.INewsDAO;
 import by.htp.ex.dao.NewsDAOException;
 import by.htp.ex.service.INewsService;
 import by.htp.ex.service.ServiceException;
-import by.htp.ex.util.validation.NewsDataValidation;
-import by.htp.ex.util.validation.ValidationProvider;
+import by.htp.ex.util.validation.NewsValidator;
+import by.htp.ex.util.validation.NewsValidator.NewsValidationBuilder;
+
 
 public class NewsServiceImpl implements INewsService {
 
 	private final INewsDAO newsDAO = DaoProvider.getInstance().getNewsDAO();
-	private final NewsDataValidation newsDataValidation = ValidationProvider.getInstance().getNewsDataValidation();
-
+	
 	@Override
 	public void add(News news) throws ServiceException {
 		String title = news.getTitle();
 		String brief = news.getBriefNews();
 		String content = news.getContent();
 		String date = news.getNewsDate();
-
-		if (!newsDataValidation.checkNewsDate(date)) {
-			throw new ServiceException("newsDate invalid");
-		} else {
-			if (!newsDataValidation.checkInputNewsData(title, brief, content)) {
-				throw new ServiceException("fields don't enter");
-			} else {
-				try {
+		
+		NewsValidationBuilder newsValidationBuilder = new NewsValidator.NewsValidationBuilder();
+		NewsValidator validator = newsValidationBuilder.checkAllNewsData(title, brief, content, date).isValid();
+		
+		if (!validator.getErrors().isEmpty()) {
+			throw new ServiceException(validator.getErrors().toString());
+		} 				
+		    try {
 					newsDAO.addNews(news);
 				} catch (NewsDAOException e) {
 					throw new ServiceException(e);
-				}
-			}
-		}
+				}	
 	}
 
 	@Override
 	public void update(News news) throws ServiceException {
+				
 		String title = news.getTitle();
 		String brief = news.getBriefNews();
 		String content = news.getContent();
 		String date = news.getNewsDate();
+		
+		NewsValidationBuilder newsValidationBuilder = new NewsValidator.NewsValidationBuilder();
+		NewsValidator validator = newsValidationBuilder.checkAllNewsData(title, brief, content, date).isValid();
 
-		if (!newsDataValidation.checkNewsDate(date)) {
-			throw new ServiceException("newsDate invalid");
-		} else {
-			if (!newsDataValidation.checkInputNewsData(title, brief, content)) {
-				throw new ServiceException("fields don't enter");
-			} else {
-				try {
+		if (!validator.getErrors().isEmpty()) {
+			throw new ServiceException(validator.getErrors().toString());
+		} 
+			try {
 					newsDAO.updateNews(news);
-				} catch (NewsDAOException e) {
+			} catch (NewsDAOException e) {
 					throw new ServiceException(e);
 				}
-			}
 		}
-	}
 
 	@Override
 	public void delete(String[] idNews) throws ServiceException {
